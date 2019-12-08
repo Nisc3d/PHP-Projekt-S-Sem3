@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="stylesheet.css" rel="stylesheet">
+    <title>Bestellung</title>
+</head>
+<body>
+<img class="BildCenter" src="media/samsunglogo.png" height="53" width="160" alt="Samsung Logo">
+<div class="Menü">
+    <ul>
+        <li class="menutab"><a href="index.html">Startseite</a></li>
+        <li class="menutab"><a href="kuehlschraenke/kuehlschraenke.html">Kühlschränke</a></li>
+        <li class="menutab"><a href="smartphones/smartphones.html">Smartphones</a></li>
+        <li class="menutab"><a href="impressum.html">Impressum</a></li>
+        <li class="menutab"><a href="bestellung.html">Bestellung</a></li>
+    </ul>
+</div>
+
+<br/><br/><br/>
+
+<div class="center">
+    <h4>Hier können sie ein Smartphone bestellen.</h4>
+    <h4>Kühlschränke können aufgrund der Größe nur über Dritthändler bestellt werden.</h4>
+    <h4>Nach dem Abschicken des Formulars werden Ihnen die Bankinformationen angezeigt.</h4>
+</div>
+
+<br/>
+
+<div class="bestellung">
+    <form action="bestellung.php" method="post">
+        <label for="email">Ihre E-Mail-Adresse:</label>
+        <input type="text" id="email" name="email"/>
+
+        <label>Nachname&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Vorname</label>
+        <input type="text" id="nachname" name="nachname"/>
+        <input type="text" id="vorname" name="vorname"/>
+
+        <label>Straße und Nr.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;PLZ</label>
+        <input type="text" id="straßenr" name="straßenr"/>
+        <input type="text" id="plz" name="plz"/>
+        <label>Ort</label>
+        <input type="text" id="ort" name="ort"/>
+
+        <br/><br/>
+
+        <label>Auswahl des Artikels (nur einen Artikel bitte):</label>
+        <select multiple="multiple" name="produkte[]">
+            <option value="Galaxy S9 64GB">Galaxy S9 64GB 500€</option>
+            <option value="Galaxy S9 128GB">Galaxy S9 128GB 600€</option>
+            <option value="Galaxy S9 512GB">Galaxy S9 512GB 700€</option>
+            <option value="Galaxy Note S9 64GB">Galaxy Note 9 64GB 700€</option>
+            <option value="Galaxy Note S9 128GB">Galaxy Note 9 128GB 800€</option>
+            <option value="Galaxy Note S9 512GB">Galaxy Note 9 512GB 900€</option>
+        </select>
+
+        <label>Farbe des Artikels:</label>
+        <input type="radio" name="farbe" value="Weiß" checked="checked">Weiß
+        <input type="radio" name="farbe" value="Schwarz" checked="checked">Schwarz
+
+        <br/><br/>
+        <input type="checkbox" name="expressversand" value="expressversand">Expressversand (Lieferung am nächsten Tag)
+
+        <label for="nachricht">Besondere Mitteilungen/Wünsche:</label>
+        <textarea id="nachricht" name="nachricht" cols="20" rows="5"></textarea>
+        <input type="submit" value="Abschicken"/>
+
+    </form>
+</div>
+
+</body>
+</html>

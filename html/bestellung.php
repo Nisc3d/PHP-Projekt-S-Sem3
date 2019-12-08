@@ -62,7 +62,15 @@
             echo "<td>nein</td></tr>";
         }
         echo "</table></div>";
-        
+
+        if(!empty($_POST["nachricht"])){
+
+        }
+
+
+            //Todo: Ihre Bestellung kommt vorraussichtlich am $tag in $ort an.
+            //Todo: Bankmitteilungen anzeigen
+            //Todo: Preis berechnen anhand Versandart
 
     }
 

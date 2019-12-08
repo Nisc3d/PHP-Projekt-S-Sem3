@@ -22,11 +22,24 @@
 
 <div class="center">
     <?php
+
+    //Falls Expressversand gewählt wurde fallen Zusatzkosten an, Variablen werden am Anfang gesetzt, weil man sie später braucht
+    if (isset($_POST["expressversand"])) {
+        $zusatzkosten = 5;
+        $expressversand = true;
+        $tage = 1;
+    } else {
+        $zusatzkosten = 0;
+        $expressversand = false;
+        $tage = 3;
+    }
+
     echo "<h2>Bestellbestätigung:</h2>";
-    var_dump($_POST);
-    //exit;
+    //var_dump($_POST);
 
     echo "<br/><br/>";
+
+    //Todo: Ordentliche Checks
 
     //Überprüfung ob mehr als ein Produkt ausgewählt wurde, !empty($_POST["produkte"]) braucht man wegen PHP Warnings
     if (!empty($_POST["produkte"]) && count($_POST["produkte"]) > 1) {
@@ -44,35 +57,59 @@
         echo "<tr><td><b>Produkt:</b></td>";
         echo "<td>";
         //Foreach Schleife, da man anders den Produkte Array nicht ausgeben kann
-        foreach($_POST["produkte"] as $schluessel => $wert) {
+        foreach ($_POST["produkte"] as $schluessel => $wert) {
             echo $wert;
         }
         echo "</td></tr>";
 
         //Farbe ausgeben
         echo "<tr><td><b>Farbe:</b></td>";
-        echo "<td>".$_POST["farbe"]."</td></tr>";
+        echo "<td>" . $_POST["farbe"] . "</td></tr>";
 
         //Abfrage nach Expressversand, je nach Checkbox-Status wird eine andere Antwort geliefert
-        if (isset($_POST["expressversand"])){
+        if ($expressversand) {
             echo "<tr><td><b>Expressversand:</b></td>";
             echo "<td>ja</td></tr>";
-        } else{
+        } else {
             echo "<tr><td><b>Expressversand:</b></td>";
             echo "<td>nein</td></tr>";
         }
         echo "</table></div>";
 
-        if(!empty($_POST["nachricht"])){
-
+        //Text, wenn eine Mitteilung hinterlassen wurde mit Abfrage
+        if (!empty($_POST["nachricht"])) {
+            echo "<br/><br/>";
+            echo "Wir haben ihre Mitteilung/ihren Wunsch erhalten.";
         }
 
+        echo "<br/><br/>";
 
-            //Todo: Ihre Bestellung kommt vorraussichtlich am $tag in $ort an.
-            //Todo: Bankmitteilungen anzeigen
-            //Todo: Preis berechnen anhand Versandart
-            //Todo: Ordentliche Checks
+        echo "Ihr Gesamtpreis beträgt: ";
+        foreach ($_POST["produkte"] as $schluessel => $wert) {
+            switch ($wert) {
+                case "Galaxy S9 64GB":
+                    echo "50" . $zusatzkosten . "€";
+                    break;
+                case "Galaxy S9 128GB":
+                    echo "60" . $zusatzkosten . "€";
+                    break;
+                case "Galaxy Note 9 64GB":
+                case "Galaxy S9 512GB":
+                    echo "70" . $zusatzkosten . "€";
+                    break;
+                case "Galaxy Note 9 128GB":
+                    echo "80" . $zusatzkosten . "€";
+                    break;
+                case "Galaxy Note 9 512GB":
+                    echo "90" . $zusatzkosten . "€";
+                    break;
+            }
+        }
 
+        echo "<p>Bitte überweisen sie das Geld auf unser Bankkonto:</p>";
+        echo "<p>IBAN: DE02500105170137075030</p>";
+        echo "<p>BIC: INGDDEFF</p>";
+        echo "<p>Nach Zahlungseingang wird es aufgrund ihrer gewählten Versandart ca. ".$tage." Tag oder Tage brauchen bis das Paket in ".$_POST["ort"]." ankommt.</p>";
     }
 
     ?>

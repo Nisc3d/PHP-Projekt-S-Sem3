@@ -71,6 +71,7 @@
             //Todo: Ihre Bestellung kommt vorraussichtlich am $tag in $ort an.
             //Todo: Bankmitteilungen anzeigen
             //Todo: Preis berechnen anhand Versandart
+            //Todo: Ordentliche Checks
 
     }
 

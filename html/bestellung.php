@@ -18,12 +18,16 @@
     </ul>
 </div>
 
-<br/><br/><br/>
+<br/>
 
 <div class="center">
     <?php
 
-    //Falls Expressversand gewählt wurde fallen Zusatzkosten an, Variablen werden am Anfang gesetzt, weil man sie später braucht
+    //Formularüberprüfung, ob alles ausgefüllt wurde
+    check($_POST);
+
+    //Falls Expressversand gewählt wurde fallen Zusatzkosten an
+    //Variablen werden am Anfang gesetzt, weil man sie später braucht
     if (isset($_POST["expressversand"])) {
         $zusatzkosten = 5;
         $expressversand = true;
@@ -35,36 +39,77 @@
     }
 
     echo "<h2>Bestellbestätigung:</h2>";
-    //var_dump($_POST);
+
+    echo "<h4>Hallo Herr/Frau " . $_POST["nachname"] . ", ihre Bestellung war erfolgreich!</h4>";
+    echo "Zusammenfassung ihrer Bestellung:<br/><br/>";
+
+    //Schleife über die Produkte, je Produkt wird eine Tabelle generiert
+    foreach ($_POST["produkte"] as $schluessel => $wert) {
+        generatetable($_POST["farbe"], $wert, $expressversand);
+        echo "<br/>";
+    }
+
+    //Falls eine Mitteilung hinterlassen wurde Ausgabe eines Erfolgstextes
+    if (!empty($_POST["nachricht"])) {
+        echo "<br/>Wir haben ihre Mitteilung/ihren Wunsch erhalten.";
+    }
 
     echo "<br/><br/>";
+    //Berechnung des Gesamtpreises
+    //Für jedes Produkt wird der Preis bestimt, der dann zum Gesamtpreis addiert wird
+    //zum Schluss kommen noch evtl. Zusatzkosten mit dazu
+    $gesamtpreis = 0;
+    foreach ($_POST["produkte"] as $schluessel => $wert) {
+        $gesamtpreis += calculateproductprice($wert);
+    }
+    $gesamtpreis += $zusatzkosten;
+    echo "Ihr Gesamtpreis beträgt: " . $gesamtpreis . "€";
 
-    //Todo: Ordentliche Checks
 
-    //Überprüfung ob mehr als ein Produkt ausgewählt wurde, !empty($_POST["produkte"]) braucht man wegen PHP Warnings
-    if (!empty($_POST["produkte"]) && count($_POST["produkte"]) > 1) {
-        echo "<h4>Bitte wählen sie nur ein Produkt aus der Liste aus.</h4>";
-    } //Überprüfung ob kein Produkt ausgewählt wurde
-    elseif (empty($_POST["produkte"])) {
-        echo "<h4>Bitte wählen sie ein Produkt aus.</h4>";
-    } //Wenn eins ausgewählt wurde weiter machen
-    else {
-        echo "<h4>Hallo Herr/Frau " . $_POST["nachname"] . ", ihre Bestellung war erfolgreich!</h4>";
-        echo "Zusammenfassung ihrer Bestellung:<br/><br/>";
+    echo "<p>Bitte überweisen sie das Geld auf unser Bankkonto:</p>";
+    echo "<p>IBAN: DE02500105170137075030</p>";
+    echo "<p>BIC: INGDDEFF</p>";
+    //Überprüfung auf $tage, damit der Satz die korrekte Mehrzahl von "Tag" hat
+    if ($tage == 1){
+        echo "<p>Nach Zahlungseingang wird es aufgrund ihrer gewählten Versandart ca. " . $tage .
+            " Tag brauchen bis das Paket in " . $_POST["ort"] . " ankommt.</p>";
+    }
+    else{
+        echo "<p>Nach Zahlungseingang wird es aufgrund ihrer gewählten Versandart ca. " . $tage .
+            " Tage brauchen bis das Paket in " . $_POST["ort"] . " ankommt.</p>";
+    }
 
-        //Tabelle
-        echo "<div class=\"tabelle\"><table border='1'>";
-        echo "<tr><td><b>Produkt:</b></td>";
-        echo "<td>";
-        //Foreach Schleife, da man anders den Produkte Array nicht ausgeben kann
-        foreach ($_POST["produkte"] as $schluessel => $wert) {
-            echo $wert;
+    //Überprüft ob alles Ausgefüllt wurde und ob ein Produkt ausgewählt wurde
+    function check($form)
+    {
+        //Wenn kein Produkt ausgewählt wurde
+        if (empty($form["produkte"])) {
+            echo "<h4>Bitte wählen sie ein Produkt aus, welches sie bestellen wollen und überprüfen sie das Formular.</h4>";
+            echo "<a href=\"bestellung.html\">Zurück</a>";
+            exit;
+        } else {
+            //Wenn etwas anderes fehlt Fehlermeldung zeigen, Überprüft ob die Strings im Formular die Länge 0 haben
+            if (strlen($form["nachname"]) == 0 || strlen($form["email"]) == 0 || strlen($form["vorname"]) == 0 ||
+                strlen($form["straßenr"]) == 0 || strlen($form["email"]) == 0 || strlen($form["plz"]) == 0 ||
+                strlen($form["ort"]) == 0) {
+                echo "<h4>Bitte überprüfen sie das Formular auf fehlende Angaben.</h4>";
+                echo "<a href=\"bestellung.html\">Zurück</a>";
+                exit;
+            }
         }
-        echo "</td></tr>";
+    }
+
+    function generatetable($farbe, $produkt, $expressversand)
+    {
+        //Tabelle erstellen
+        echo "<div class=\"tabelle\"><table border='1'>";
+        //Produkt ausgeben
+        echo "<tr><td><b>Produkt:</b></td>";
+        echo "<td>" . $produkt . "</td></tr>";
 
         //Farbe ausgeben
         echo "<tr><td><b>Farbe:</b></td>";
-        echo "<td>" . $_POST["farbe"] . "</td></tr>";
+        echo "<td>" . $farbe . "</td></tr>";
 
         //Abfrage nach Expressversand, je nach Checkbox-Status wird eine andere Antwort geliefert
         if ($expressversand) {
@@ -74,42 +119,34 @@
             echo "<tr><td><b>Expressversand:</b></td>";
             echo "<td>nein</td></tr>";
         }
+        //Tabelle beenden
         echo "</table></div>";
 
-        //Text, wenn eine Mitteilung hinterlassen wurde mit Abfrage
-        if (!empty($_POST["nachricht"])) {
-            echo "<br/><br/>";
-            echo "Wir haben ihre Mitteilung/ihren Wunsch erhalten.";
+    }
+
+    //bekommt das Produkt und gibt den Preis zurück
+    function calculateproductprice($produkt)
+    {
+        $preis = 0;
+        switch ($produkt) {
+            case "Galaxy S9 64GB":
+                $preis += 500;
+                break;
+            case "Galaxy S9 128GB":
+                $preis += 600;
+                break;
+            case "Galaxy Note 9 64GB":
+            case "Galaxy S9 512GB":
+                $preis += 700;
+                break;
+            case "Galaxy Note 9 128GB":
+                $preis += 800;
+                break;
+            case "Galaxy Note 9 512GB":
+                $preis += 900;
+                break;
         }
-
-        echo "<br/><br/>";
-
-        echo "Ihr Gesamtpreis beträgt: ";
-        foreach ($_POST["produkte"] as $schluessel => $wert) {
-            switch ($wert) {
-                case "Galaxy S9 64GB":
-                    echo "50" . $zusatzkosten . "€";
-                    break;
-                case "Galaxy S9 128GB":
-                    echo "60" . $zusatzkosten . "€";
-                    break;
-                case "Galaxy Note 9 64GB":
-                case "Galaxy S9 512GB":
-                    echo "70" . $zusatzkosten . "€";
-                    break;
-                case "Galaxy Note 9 128GB":
-                    echo "80" . $zusatzkosten . "€";
-                    break;
-                case "Galaxy Note 9 512GB":
-                    echo "90" . $zusatzkosten . "€";
-                    break;
-            }
-        }
-
-        echo "<p>Bitte überweisen sie das Geld auf unser Bankkonto:</p>";
-        echo "<p>IBAN: DE02500105170137075030</p>";
-        echo "<p>BIC: INGDDEFF</p>";
-        echo "<p>Nach Zahlungseingang wird es aufgrund ihrer gewählten Versandart ca. ".$tage." Tag oder Tage brauchen bis das Paket in ".$_POST["ort"]." ankommt.</p>";
+        return $preis;
     }
 
     ?>
